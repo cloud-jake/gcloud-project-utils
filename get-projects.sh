@@ -40,20 +40,20 @@ export PROJECTS=""
 
 # Get Folders in Organization (3 layers deep)
 echo "Getting Folders and Projects for Organization ${ORGNAME}: ${ORG_ID}"
-PROJECTS+=($(gcloud projects list --filter parent.type="organization" --filter parent.id="${ORG_ID}" --format="csv[no-heading](projectId,parent.id)" ))
+PROJECTS+=($(gcloud projects list --filter parent.type="organization" --filter parent.id="${ORG_ID}" --format="csv[no-heading](parent.id,projectId)" ))
 
   for folder1 in $(gcloud resource-manager folders list --organization="${ORG_ID}"  --format="value(ID)") 
   do 
     echo "${ORG_ID} -->  ${folder1}"
-    PROJECTS+=($(gcloud projects list --filter parent.type="folder" --filter parent.id="${folder1}" --format="csv[no-heading](projectId,parent.id)" ))
+    PROJECTS+=($(gcloud projects list --filter parent.type="folder" --filter parent.id="${folder1}" --format="csv[no-heading](parent.id,projectId)" ))
     for folder2 in $(gcloud resource-manager folders list --folder="${folder1}"  --format="value(ID)")  
     do
       echo "${ORG_ID} --> ${folder1} --> ${folder2}"
-      PROJECTS+=($(gcloud projects list --filter parent.type="folder" --filter parent.id="${folder2}"  --format="csv[no-heading](projectId,parent.id)" ))
+      PROJECTS+=($(gcloud projects list --filter parent.type="folder" --filter parent.id="${folder2}"  --format="csv[no-heading](parent.id,projectId)" ))
       for folder3 in $(gcloud resource-manager folders list --folder="${folder2}"  --format="value(ID)")
         do
           echo "${ORG_ID} --> ${folder1} --> ${folder2} --> ${folder3}"
-          PROJECTS+=($(gcloud projects list --filter parent.type="folder" --filter parent.id="${folder3}"  --format="csv[no-heading](projectId,parent.id)" ))
+          PROJECTS+=($(gcloud projects list --filter parent.type="folder" --filter parent.id="${folder3}"  --format="csv[no-heading](parent.id,projectId)" ))
       done
     done
   done
@@ -70,4 +70,4 @@ echo
 cat projects.temp | grep -v '^[[:space:]]*$' > projects.csv
 rm -f projects.temp
 
-cat projects.csv
+cat projects.csv 
