@@ -38,7 +38,7 @@ ORG_ID=$(gcloud organizations list --filter displayName="${ORGNAME}" --format="v
 
 export PROJECTS=""
 
-# Get Folders in Organization
+# Get Folders in Organization (3 layers deep)
 echo "Getting Folders and Projects for Organization ${ORGNAME}: ${ORG_ID}"
 PROJECTS+=($(gcloud projects list --filter parent.type="organization" --filter parent.id="${ORG_ID}" --format="csv[no-heading](projectId,parent.id)" ))
 
@@ -47,9 +47,14 @@ PROJECTS+=($(gcloud projects list --filter parent.type="organization" --filter p
     echo "${ORG_ID} -->  ${folder1}"
     PROJECTS+=($(gcloud projects list --filter parent.type="folder" --filter parent.id="${folder1}" --format="csv[no-heading](projectId,parent.id)" ))
     for folder2 in $(gcloud resource-manager folders list --folder="${folder1}"  --format="value(ID)")  
-      do
-        echo "${ORG_ID} --> ${folder1} --> ${folder2}"
-        PROJECTS+=($(gcloud projects list --filter parent.type="folder" --filter parent.id="${folder2}"  --format="csv[no-heading](projectId,parent.id)" ))
+    do
+      echo "${ORG_ID} --> ${folder1} --> ${folder2}"
+      PROJECTS+=($(gcloud projects list --filter parent.type="folder" --filter parent.id="${folder2}"  --format="csv[no-heading](projectId,parent.id)" ))
+      for folder3 in $(gcloud resource-manager folders list --folder="${folder2}"  --format="value(ID)")
+        do
+          echo "${ORG_ID} --> ${folder1} --> ${folder2} --> ${folder3}"
+          PROJECTS+=($(gcloud projects list --filter parent.type="folder" --filter parent.id="${folder3}"  --format="csv[no-heading](projectId,parent.id)" ))
+      done
     done
   done
 
