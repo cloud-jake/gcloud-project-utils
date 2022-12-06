@@ -67,7 +67,11 @@ done
 
 echo 
 
-cat projects.temp | grep -v '^[[:space:]]*$' > projects.csv
+# Construct Filename
+FILENAME="${ORG_ID}_${ORGNAME}"
+
+
+cat projects.temp | grep -v '^[[:space:]]*$' > ${FILENAME}.csv
 rm -f projects.temp
 
-cat projects.csv 
+cat ${FILENAME}.csv 
